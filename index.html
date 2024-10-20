@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moldova EU Referendum Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        input {
+            padding: 5px;
+            margin: 5px;
+            width: 150px;
+        }
+        .result {
+            margin-top: 20px;
+            font-size: 1.2em;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Moldova EU Referendum Calculator</h1>
+    <p>Current voting data is prefilled. Update as more data comes in:</p>
+
+    <label for="totalProcessed">Processed Percentage:</label>
+    <input type="number" id="totalProcessed" value="92.25" step="0.01" placeholder="Processed Percentage" oninput="calculate()"><br>
+
+    <label for="validVotes">Valid Votes Processed:</label>
+    <input type="number" id="validVotes" value="1285294" placeholder="Valid Votes Processed" oninput="calculate()"><br>
+
+    <label for="yesVotes">"Yes" Votes:</label>
+    <input type="number" id="yesVotes" value="601355" placeholder="Yes Votes" oninput="calculate()"><br>
+
+    <label for="noVotes">"No" Votes:</label>
+    <input type="number" id="noVotes" value="683939" placeholder="No Votes" oninput="calculate()"><br>
+
+    <div class="result" id="result"></div>
+    <div class="totalVotes" id="totalVotes"></div>
+
+    <script>
+        function calculate() {
+            const totalProcessed = Number(document.getElementById('totalProcessed').value) / 100;
+            const validVotes = Number(document.getElementById('validVotes').value);
+            const yesVotes = Number(document.getElementById('yesVotes').value);
+            const noVotes = Number(document.getElementById('noVotes').value);
+
+            // Calculate total potential votes if 100% were processed
+            const totalVotes = validVotes / totalProcessed;
+
+            // Calculate remaining votes to be counted
+            const remainingVotes = totalVotes - validVotes;
+
+            // Calculate current lead of "No"
+            const noLead = noVotes - yesVotes;
+
+            // Calculate how many "Yes" votes are needed to surpass 50% of the total
+            const neededYesVotesToWin = (totalVotes / 2) - yesVotes;
+
+            // If "Yes" votes are already enough, no need to calculate
+            if (neededYesVotesToWin <= 0) {
+                document.getElementById('result').innerHTML = `Yes has already won!`;
+                return;
+            }
+
+            // Calculate the percentage of the remaining votes that need to be "Yes"
+            const requiredYesPercentage = (neededYesVotesToWin / remainingVotes) * 100;
+
+            // Output the total votes
+            document.getElementById('totalVotes').innerHTML = `Total potential votes when 100% processed: ${Math.round(totalVotes).toLocaleString()}`;
+
+            // Output the required Yes percentage
+            if (requiredYesPercentage <= 100) {
+                document.getElementById('result').innerHTML = `Yes needs ${requiredYesPercentage.toFixed(2)}% of the remaining votes to win.`;
+            } else {
+                document.getElementById('result').innerHTML = `Yes cannot win with the current data.`;
+            }
+        }
+
+        // Initial calculation on page load
+        calculate();
+    </script>
+
+</body>
+</html>
+
