@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Moldova EU Referendum Calculator</title>
+    <title>Moldova EU Referendum Live Results</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
     <style>
         @keyframes pulse {
@@ -16,40 +16,59 @@
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen">
-    <div class="container mx-auto px-4 py-8">
-        <h1 class="text-4xl font-bold text-center text-blue-600 mb-8">Moldova EU Referendum Calculator</h1>
+    <div class="container mx-auto px-4 py-8 max-w-4xl">
+        <h1 class="text-4xl font-bold text-center text-blue-600 mb-2">Moldova EU Referendum</h1>
+        <p class="text-center text-gray-600 mb-8">Live Results</p>
         <div class="bg-white rounded-lg shadow-lg p-6">
-            <p class="text-center text-gray-600 mb-4">Data updates automatically every 10 seconds</p>
-            <div class="pulse text-center text-green-500 text-sm mb-4">Live updating...</div>
-            <div class="mb-6">
-                <h2 class="text-xl font-semibold mb-2">Votes Processed</h2>
-                <div class="bg-gray-200 rounded-full h-6 overflow-hidden">
-                    <div id="progressBar" class="bg-blue-500 h-full text-xs text-center text-white leading-6"></div>
+            <div class="pulse text-center text-green-500 text-sm mb-6">Live updating every 10 seconds</div>
+            
+            <div class="mb-8">
+                <div class="flex justify-between items-center mb-2">
+                    <h2 class="text-xl font-semibold">Votes Counted</h2>
+                    <span id="totalProcessed" class="text-gray-600">Loading...</span>
                 </div>
-                <div class="flex justify-between text-sm text-gray-600 mt-1">
-                    <span id="validVotes">Loading...</span>
-                    <span id="totalProcessed">Loading...</span>
+                <div class="bg-gray-200 rounded-full h-4 overflow-hidden">
+                    <div id="progressBar" class="bg-blue-500 h-full transition-all duration-500 ease-in-out"></div>
                 </div>
+                <p id="validVotes" class="text-right text-sm text-gray-600 mt-1">Loading...</p>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+
+            <div class="grid grid-cols-2 gap-4 mb-8">
                 <div class="bg-green-100 rounded-lg p-4">
-                    <h3 class="text-lg font-semibold text-green-700">"Yes" Votes</h3>
-                    <p class="text-3xl font-bold text-green-600" id="yesVotes">Loading...</p>
-                    <p class="text-green-600" id="yesPercentage">Loading...</p>
+                    <h3 class="text-xl font-semibold text-green-700 mb-2">"Yes" Votes</h3>
+                    <p class="text-4xl font-bold text-green-600" id="yesVotes">Loading...</p>
+                    <p class="text-xl text-green-600" id="yesPercentage">Loading...</p>
                 </div>
                 <div class="bg-red-100 rounded-lg p-4">
-                    <h3 class="text-lg font-semibold text-red-700">"No" Votes</h3>
-                    <p class="text-3xl font-bold text-red-600" id="noVotes">Loading...</p>
-                    <p class="text-red-600" id="noPercentage">Loading...</p>
+                    <h3 class="text-xl font-semibold text-red-700 mb-2">"No" Votes</h3>
+                    <p class="text-4xl font-bold text-red-600" id="noVotes">Loading...</p>
+                    <p class="text-xl text-red-600" id="noPercentage">Loading...</p>
                 </div>
             </div>
-            <div class="bg-yellow-100 rounded-lg p-4 mb-6">
-                <h3 class="text-lg font-semibold text-yellow-700">Total Potential Votes (100% Processed)</h3>
-                <p class="text-3xl font-bold text-yellow-600" id="totalVotes">Loading...</p>
+
+            <div class="bg-blue-100 rounded-lg p-4 mb-8">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-xl font-semibold text-blue-700">Current Lead</h3>
+                    <p class="text-xl font-bold text-blue-600" id="leadingOption">Loading...</p>
+                </div>
+                <div class="flex justify-between items-center mt-2">
+                    <p class="text-lg text-blue-600" id="voteDifference">Loading...</p>
+                    <p class="text-lg text-blue-600" id="percentageDifference">Loading...</p>
+                </div>
             </div>
-            <div class="bg-purple-100 rounded-lg p-4">
-                <h3 class="text-lg font-semibold text-purple-700">Required "Yes" Percentage of Remaining Votes</h3>
-                <p class="text-3xl font-bold text-purple-600" id="requiredYes">Loading...</p>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div class="bg-purple-100 rounded-lg p-4">
+                    <h3 class="text-xl font-semibold text-purple-700 mb-2">For "Yes" to Win</h3>
+                    <p class="text-3xl font-bold text-purple-600" id="additionalYesVotes">Loading...</p>
+                    <p class="text-sm text-purple-600" id="requiredYesPercentage">Loading...</p>
+                </div>
+
+                <div class="bg-yellow-100 rounded-lg p-4">
+                    <h3 class="text-xl font-semibold text-yellow-700 mb-2">Remaining Votes</h3>
+                    <p class="text-3xl font-bold text-yellow-600" id="remainingVotes">Loading...</p>
+                    <p class="text-sm text-yellow-600" id="totalVotes">Loading...</p>
+                </div>
             </div>
         </div>
     </div>
@@ -89,7 +108,7 @@
                 return;
             }
 
-            const validVotesProcessed = yesData.BallotsValidVotes; // Both should be the same
+            const validVotesProcessed = yesData.BallotsValidVotes;
             const totalBallots = yesData.TotalBalots;
             const processedBallots = yesData.TotalBalotsProcessed;
             const processedPercentage = (processedBallots / totalBallots) * 100;
@@ -105,24 +124,35 @@
             const yesVotesNeededToWin = Math.ceil(totalVotesEstimate / 2) + 1;
             const yesVotesStillNeeded = yesVotesNeededToWin - yesVotes;
 
-            let requiredYesPercentage;
-            if (yesVotesStillNeeded <= 0) {
-                requiredYesPercentage = "Yes has already won!";
-            } else if (yesVotesStillNeeded > remainingVotes) {
-                requiredYesPercentage = "Yes cannot win with the remaining votes.";
-            } else {
-                requiredYesPercentage = ((yesVotesStillNeeded / remainingVotes) * 100).toFixed(2) + "%";
-            }
+            const voteDifference = Math.abs(yesVotes - noVotes);
+            const percentageDifference = Math.abs(yesPercentage - noPercentage);
+            const leadingOption = yesVotes > noVotes ? "Yes" : "No";
 
-            document.getElementById('validVotes').textContent = validVotesProcessed.toLocaleString() + " votes";
-            document.getElementById('totalProcessed').textContent = processedPercentage.toFixed(2) + "% processed";
+            const requiredYesPercentage = yesVotesStillNeeded > 0 ? ((yesVotesStillNeeded / remainingVotes) * 100).toFixed(2) : 0;
+
+            document.getElementById('validVotes').textContent = validVotesProcessed.toLocaleString() + " votes counted";
+            document.getElementById('totalProcessed').textContent = processedPercentage.toFixed(2) + "% of total votes";
             document.getElementById('progressBar').style.width = processedPercentage + "%";
             document.getElementById('yesVotes').textContent = yesVotes.toLocaleString();
             document.getElementById('yesPercentage').textContent = yesPercentage.toFixed(2) + "%";
             document.getElementById('noVotes').textContent = noVotes.toLocaleString();
             document.getElementById('noPercentage').textContent = noPercentage.toFixed(2) + "%";
-            document.getElementById('totalVotes').textContent = totalVotesEstimate.toLocaleString();
-            document.getElementById('requiredYes').textContent = requiredYesPercentage;
+            document.getElementById('leadingOption').textContent = leadingOption + " is winning";
+            document.getElementById('voteDifference').textContent = "by " + voteDifference.toLocaleString() + " votes";
+            document.getElementById('percentageDifference').textContent = percentageDifference.toFixed(2) + "% difference";
+            document.getElementById('remainingVotes').textContent = remainingVotes.toLocaleString();
+            document.getElementById('totalVotes').textContent = "of " + totalVotesEstimate.toLocaleString() + " total estimated";
+            
+            if (yesVotesStillNeeded <= 0) {
+                document.getElementById('additionalYesVotes').textContent = "Yes has won";
+                document.getElementById('requiredYesPercentage').textContent = "";
+            } else if (yesVotesStillNeeded > remainingVotes) {
+                document.getElementById('additionalYesVotes').textContent = "Yes cannot win";
+                document.getElementById('requiredYesPercentage').textContent = "Not enough remaining votes";
+            } else {
+                document.getElementById('additionalYesVotes').textContent = yesVotesStillNeeded.toLocaleString();
+                document.getElementById('requiredYesPercentage').textContent = "more Yes votes needed (" + requiredYesPercentage + "% of remaining)";
+            }
         }
 
         calculateElectionData();
