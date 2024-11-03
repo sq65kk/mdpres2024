@@ -109,6 +109,8 @@
             }
         }
 
+        let validVotesProcessed = 0;
+
         async function calculateElectionData() {
             const presenceData = await fetchPresenceData();
             if (!presenceData) {
@@ -143,7 +145,12 @@
 
             const totalVotesEstimate = presenceNationalData.TotalVoted;
 
-            const validVotesProcessed = maiaData.BallotsValidVotes;
+            if (maiaData.BallotsValidVotes < validVotesProcessed) {
+                console.error("Invalid votes processed");
+                return;
+            }
+            validVotesProcessed = maiaData.BallotsValidVotes;
+            
             const processedPercentage = (validVotesProcessed / totalVotesEstimate) * 100;
 
             const maiaVotes = maiaData.BallotCount;
